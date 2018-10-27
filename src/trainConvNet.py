@@ -1,3 +1,4 @@
+#coding=utf-8 
 # Author: Yan Zhang  
 # Email: zhangyan.cse (@) gmail.com
 
@@ -44,11 +45,11 @@ batch_size = 256
 # high_resolution_samples = np.minimum(HiC_max_value, high_resolution_samples)
 
 
-#low_resolution_samples = np.load(gzip.GzipFile('../../data/GM12878_replicate_down16_chr19_22.npy.gz', "r")).astype(np.float32) * down_sample_ratio
-#high_resolution_samples = np.load(gzip.GzipFile('../../data/GM12878_replicate_original_chr19_22.npy.gz', "r")).astype(np.float32)
+low_resolution_samples = np.load(gzip.GzipFile('../HiCPlus/data/GM12878_replicate_down16_chr19_22.npy.gz', "r")).astype(np.float32) * down_sample_ratio
+high_resolution_samples = np.load(gzip.GzipFile('../HiCPlus/data/GM12878_replicate_original_chr19_22.npy.gz', "r")).astype(np.float32)
 
-low_resolution_samples = np.load(gzip.GzipFile('/home/zhangyan/SRHiC_samples/IMR90_down_HINDIII16_chr1_8.npy.gz', "r")).astype(np.float32) * down_sample_ratio
-high_resolution_samples = np.load(gzip.GzipFile('/home/zhangyan/SRHiC_samples/original10k/_IMR90_HindIII_original_chr1_8.npy.gz', "r")).astype(np.float32)
+#low_resolution_samples = np.load(gzip.GzipFile('/home/zhangyan/SRHiC_samples/IMR90_down_HINDIII16_chr1_8.npy.gz', "r")).astype(np.float32) * down_sample_ratio
+#high_resolution_samples = np.load(gzip.GzipFile('/home/zhangyan/SRHiC_samples/original10k/_IMR90_HindIII_original_chr1_8.npy.gz', "r")).astype(np.float32)
 
 
 low_resolution_samples = np.minimum(HiC_max_value, low_resolution_samples)
@@ -77,28 +78,28 @@ hires_loader = torch.utils.data.DataLoader(hires_set, batch_size=batch_size, shu
 
 
 Net = model.Net(40, 28)
-
+print(Net)
 if use_gpu:
     Net = Net.cuda()
 
 optimizer = optim.SGD(Net.parameters(), lr = 0.00001)
 _loss = nn.MSELoss()
 Net.train()
-
+#model.summray()
 running_loss = 0.0
 running_loss_validate = 0.0
 reg_loss = 0.0
 
 # write the log file to record the training process
-log = open('HindIII_train.txt', 'w')
-for epoch in range(0, 100000):
+log = open('HindIII_train_test.txt', 'w')
+for epoch in range(0, 100):
     for i, (v1, v2) in enumerate(zip(lowres_loader, hires_loader)):    
         if (i == len(lowres_loader) - 1):
             continue 
         _lowRes, _ = v1
         _highRes, _ = v2
         
-
+	_highRes = _highRes.reshape((256, 1, 28, 28))
         _lowRes = Variable(_lowRes)
         _highRes = Variable(_highRes)
 
@@ -116,14 +117,14 @@ for epoch in range(0, 100000):
 
         running_loss += loss.data[0]
         
-    print '-------', i, epoch, running_loss/i, strftime("%Y-%m-%d %H:%M:%S", gmtime())
+    print('-------', i, epoch, loss.data[0], strftime("%Y-%m-%d %H:%M:%S", gmtime()))
     
-    log.write(str(epoch) + ', ' + str(running_loss/i,) + '\n')
+    log.write(str(epoch) + ', ' + str(loss.data[0],) + '\n')
     running_loss = 0.0
     running_loss_validate = 0.0
     # save the model every 100 epoches
     if (epoch % 100 == 0):
-        torch.save(Net.state_dict(), '/home/zhangyan/pytorch_models/pytorch_HindIII_model_' + str(epoch))
+        torch.save(Net.state_dict(), '\savemodel\pytorch_Hi-C_model_' + str(epoch))
         pass
 
 
