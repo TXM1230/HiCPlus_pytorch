@@ -45,8 +45,8 @@ batch_size = 256
 # high_resolution_samples = np.minimum(HiC_max_value, high_resolution_samples)
 
 
-low_resolution_samples = np.load(gzip.GzipFile('../HiCPlus/data/GM12878_replicate_down16_chr19_22.npy.gz', "r")).astype(np.float32) * down_sample_ratio
-high_resolution_samples = np.load(gzip.GzipFile('../HiCPlus/data/GM12878_replicate_original_chr19_22.npy.gz', "r")).astype(np.float32)
+low_resolution_samples = np.load('low_samples_cluster_4.npy').astype(np.float32)
+high_resolution_samples = np.load('high_samples_cluster_4.npy').astype(np.float32)
 
 #low_resolution_samples = np.load(gzip.GzipFile('/home/zhangyan/SRHiC_samples/IMR90_down_HINDIII16_chr1_8.npy.gz', "r")).astype(np.float32) * down_sample_ratio
 #high_resolution_samples = np.load(gzip.GzipFile('/home/zhangyan/SRHiC_samples/original10k/_IMR90_HindIII_original_chr1_8.npy.gz', "r")).astype(np.float32)
@@ -99,7 +99,7 @@ for epoch in range(0, 100):
         _lowRes, _ = v1
         _highRes, _ = v2
         
-	_highRes = _highRes.reshape((256, 1, 28, 28))
+		_highRes = _highRes.reshape((256, 1, 28, 28))
         _lowRes = Variable(_lowRes)
         _highRes = Variable(_highRes)
 
